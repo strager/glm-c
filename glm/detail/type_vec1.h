@@ -3,6 +3,8 @@
 
 #include "qualifier.h"
 
+#include "type_vec1.inl"
+
 #define GLM_DECLARE_TVEC1(T) \
 GLM_API glm_vec(1, T) \
 glm(convert, T##1) (glm_type _type0, va_list _ap), \
@@ -42,7 +44,5 @@ GLM_DECLARE_TVEC1(bool)
 #define   convert_uint1(...) glm_convert_uint1  (__VA_ARGS__)
 #define   convert_bool1(...) glm_convert_bool1  (__VA_ARGS__)
 #endif
-
-#include "type_vec1.inl"
 
 #endif /* GLM_DETAIL_TYPE_VEC1_H */

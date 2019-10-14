@@ -6,9 +6,9 @@
 #define max(x,y) (((x)>(y))?(x):(y))
 #define clamp(x,a,b) (((x)<(a))?(a):((x)>(b))?(b):(x))
 
-typedef unsigned char bool;
-#define true (1)
-#define false (0)
+//typedef unsigned char bool;
+//#define true (1)
+//#define false (0)
 typedef unsigned int uint;
 
 #define GLM_DECLARE_VECTORS(T)\
@@ -492,7 +492,7 @@ GLM_DECLARE_TVEC_CONSTRUCTORS(bool)
 
 
 
-#if (defined(GLM_HEADER_ONLY))
+#if 1 || (defined(GLM_HEADER_ONLY))
 
 GLM_DEFINE_VECTORS(float)
 GLM_DEFINE_VECTORS(double)

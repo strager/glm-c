@@ -7,7 +7,7 @@ glm(convert, T) (glm_type _type0, va_list _ap)\
     glm(T) _dst;\
     \
     if      (_type0 == GLM_TYPE_FLOAT)\
-        _dst = (T) va_arg( _ap, glm(float) );\
+        _dst = (T) va_arg( _ap, glm(double) );\
     else if (_type0 == GLM_TYPE_DOUBLE)\
         _dst = (T) va_arg( _ap, glm(double) );\
     else if (_type0 == GLM_TYPE_INT)\
@@ -15,7 +15,7 @@ glm(convert, T) (glm_type _type0, va_list _ap)\
     else if (_type0 == GLM_TYPE_UINT)\
         _dst = (T) va_arg( _ap, glm(uint) );\
     else if (_type0 == GLM_TYPE_BOOL)\
-        _dst = (T) va_arg( _ap, glm(bool) );\
+        _dst = (T) va_arg( _ap, glm(int) );\
     \
     return _dst;\
 }
