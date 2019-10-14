@@ -52,9 +52,9 @@ typedef union {
     })
 
 #define GLM_CONVERT_TYPE_X(T, IN) \
-    _Generic( \
+    __typeof__(_Generic( \
         (IN), \
-        int: (glm_vec(1, T)) {}, \
+        int: (glm_vec(1, T)) {}, /* doesn't work, yo. */ \
         default: _Generic( \
             (char(*)[sizeof (IN) / sizeof (IN).x])0, \
             char(*)[1]: (glm_vec(1, T)) {}, \
@@ -62,42 +62,33 @@ typedef union {
             char(*)[3]: (glm_vec(3, T)) {}, \
             char(*)[4]: (glm_vec(4, T)) {} \
         ) \
-    )
+    ))
 
-#define CAT(T, LHS, RHS) \
+#define VEC_WIDTH(vec) (sizeof (vec) / sizeof (vec).x)
+
+#define VEC_TYPE(element_type, width) \
+    __typeof__(_Generic( \
+        (char(*)[(width)])0, \
+        char(*)[1]: (glm_vec(1, element_type)) {}, \
+        char(*)[2]: (glm_vec(2, element_type)) {}, \
+        char(*)[3]: (glm_vec(3, element_type)) {}, \
+        char(*)[4]: (glm_vec(4, element_type)) {} \
+    ))
+
+#define CAT_V2(T, LHS, RHS) \
         (((union { \
             struct { \
-                __typeof__(GLM_CONVERT_TYPE_X(T, LHS)) left;   \
-                __typeof__(GLM_CONVERT_TYPE_X(T, RHS)) right;  \
+                GLM_CONVERT_TYPE_X(T, LHS) left;   \
+                GLM_CONVERT_TYPE_X(T, RHS) right;  \
             } input; \
-            __typeof__(_Generic( \
-                GLM_CONVERT_TYPE_X(T, LHS), \
-                glm_vec(1, T): _Generic(GLM_CONVERT_TYPE_X(T, RHS), \
-                    glm_vec(1, T): (glm_vec(2, T)){}, \
-                    glm_vec(2, T): (glm_vec(3, T)){}, \
-                    glm_vec(3, T): (glm_vec(4, T)){}, \
-                    glm_vec(4, T): (glm_vec(4, T)){} \
-                ), \
-                glm_vec(2, T): _Generic(GLM_CONVERT_TYPE_X(T, RHS), \
-                    glm_vec(1, T): (glm_vec(3, T)){}, \
-                    glm_vec(2, T): (glm_vec(4, T)){}, \
-                    glm_vec(3, T): (glm_vec(4, T)){}, \
-                    glm_vec(4, T): (glm_vec(4, T)){} \
-                ), \
-                glm_vec(3, T): _Generic(GLM_CONVERT_TYPE_X(T, RHS), \
-                    glm_vec(1, T): (glm_vec(4, T)){}, \
-                    glm_vec(2, T): (glm_vec(4, T)){}, \
-                    glm_vec(3, T): (glm_vec(4, T)){}, \
-                    glm_vec(4, T): (glm_vec(4, T)){} \
-                ), \
-                glm_vec(4, T): _Generic(GLM_CONVERT_TYPE_X(T, RHS), \
-                    glm_vec(1, T): (glm_vec(4, T)){}, \
-                    glm_vec(2, T): (glm_vec(4, T)){}, \
-                    glm_vec(3, T): (glm_vec(4, T)){}, \
-                    glm_vec(4, T): (glm_vec(4, T)){} \
-                ) \
-            )) output; \
+            VEC_TYPE( \
+                T, \
+                (VEC_WIDTH(LHS) + VEC_WIDTH(RHS)) > 4 \
+                    ? 4 \
+                    : (VEC_WIDTH(LHS) + VEC_WIDTH(RHS)) \
+            ) output; \
         }) { .input = { .left = GLM_CONVERT_TVECN(T, LHS), .right = GLM_CONVERT_TVECN(T, RHS) } }) .output)
+
 
 int main(int argc, char** argv) {
 
@@ -105,15 +96,14 @@ int main(int argc, char** argv) {
     ivec1 lhs = {42};
     ivec2 rhs = {5, 6};
 
-    ivec3 x = CAT(int, lhs, rhs);
+    ivec3 x = CAT_V2(int, lhs, rhs);
     //printf("<%d %d %d %d>\n", x.x, x.y, x.z, x.w);
     printf("<%d %d %d>\n", x.x, x.y, x.z);
 
     fvec2 y = GLM_CONVERT_TVECN(float, rhs);
     printf("<%f %f>\n", y.x, y.y);
 
-    fvec3 x2 = CAT(float, lhs, rhs);
-    //printf("<%d %d %d %d>\n", x.x, x.y, x.z, x.w);
+    fvec3 x2 = CAT_V2(float, lhs, rhs);
     printf("<%f %f %f>\n", x2.x, x2.y, x2.z);
 
     return 0;
